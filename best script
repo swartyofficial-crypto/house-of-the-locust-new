@@ -1,0 +1,1454 @@
+-- =====================================================
+-- House of the Locust - CUSTOM GUI (v2)
+-- =====================================================
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local Workspace = game:GetService("Workspace")
+local LocalPlayer = Players.LocalPlayer
+
+pcall(function()
+    local pg = LocalPlayer:FindFirstChild("PlayerGui")
+    if pg then
+        local old = pg:FindFirstChild("LocustMenu")
+        if old then old:Destroy() end
+        local old2 = pg:FindFirstChild("LocustPopups")
+        if old2 then old2:Destroy() end
+    end
+end)
+
+-- =====================================================
+-- RENK PALETİ (bizim tarz)
+-- =====================================================
+local RENK = {
+    bg          = Color3.fromRGB(12, 12, 18),
+    bg2         = Color3.fromRGB(18, 18, 26),
+    bg3         = Color3.fromRGB(25, 25, 35),
+    kenar       = Color3.fromRGB(100, 100, 140),
+    cyan        = Color3.fromRGB(0, 220, 255),
+    mavi        = Color3.fromRGB(60, 140, 255),
+    acik_mavi   = Color3.fromRGB(120, 180, 255),
+    yesil       = Color3.fromRGB(60, 220, 120),
+    kirmizi     = Color3.fromRGB(220, 60, 80),
+    turuncu     = Color3.fromRGB(255, 180, 60),
+    sari        = Color3.fromRGB(255, 220, 80),
+    beyaz       = Color3.fromRGB(240, 240, 255),
+    gri         = Color3.fromRGB(160, 160, 190),
+    mor         = Color3.fromRGB(160, 80, 220),
+}
+
+local FONT = Enum.Font.Garamond
+local FONT_MED = Enum.Font.GothamMedium
+
+-- =====================================================
+-- ASSETS
+-- =====================================================
+local RESIM = "rbxassetid://64382707"
+local TOGGLE_RESIM = "rbxassetid://73745881790792"
+local SHINE_RESIM = "rbxassetid://159602101"
+local SES_ID = "rbxassetid://122835655736085"
+
+-- =====================================================
+-- ЯЗЫКИ
+-- =====================================================
+local Languages = {
+    {code = "EN", name = "English"},
+    {code = "RU", name = "Русский"},
+    {code = "ES", name = "Español"},
+    {code = "DE", name = "Deutsch"},
+    {code = "ZH", name = "中文"},
+    {code = "JA", name = "日本語"},
+    {code = "UK", name = "Українська"},
+    {code = "KK", name = "Қазақша"},
+    {code = "FR", name = "Français"},
+    {code = "IT", name = "Italiano"},
+}
+local CurrentLang = "EN"
+
+local Texts = {
+    EN = {
+        tabPlayer = "Player", tabTP = "Teleport", tabESP = "ESP", tabSettings = "Settings",
+        secSurvival = "Survival", secMove = "Movement", secOther = "Other",
+        secPlayers = "Players", secObjects = "Objects", secLocations = "Locations",
+        secHighlight = "Highlight", secLang = "Language", secInfo = "Info",
+        godMode = "God Mode", godSpeed = "Speed at height",
+        infJump = "Infinite jump", jumpPower = "Jump power",
+        jumpPowerVal = "Jump power (0=off)", noclip = "Noclip",
+        tpPlayer = "Teleport to player",
+        tpNearestPlayer = "Teleport to nearest player",
+        tpNearestObj = "Teleport to nearest object",
+        tpSpawn = "Spawn room",
+        espPlayers = "ESP Players (green)", espMonster = "ESP Monster (red)",
+        version = "Version 2.0", on = "ON", off = "OFF",
+        tpWindow = "Teleport to player", tpBtn = "Teleport",
+        changeLang = "Change language", langWindow = "Language",
+    },
+    RU = {
+        tabPlayer = "Игрок", tabTP = "Телепорт", tabESP = "ESP", tabSettings = "Настройки",
+        secSurvival = "Выживание", secMove = "Движение", secOther = "Прочее",
+        secPlayers = "Игроки", secObjects = "Объекты", secLocations = "Локации",
+        secHighlight = "Подсветка", secLang = "Язык", secInfo = "Инфо",
+        godMode = "Режим Бога", godSpeed = "Скорость на высоте",
+        infJump = "Бесконечные прыжки", jumpPower = "Сила прыжка",
+        jumpPowerVal = "Сила прыжка (0=выкл)", noclip = "Noclip",
+        tpPlayer = "Телепорт к игроку", tpNearestPlayer = "Телепорт к ближайшему игроку",
+        tpNearestObj = "Телепорт к ближайшему объекту", tpSpawn = "Комната спавна",
+        espPlayers = "ESP Игроки (зелёный)", espMonster = "ESP Монстр (красный)",
+        version = "Версия 2.0", on = "ВКЛ", off = "ВЫКЛ",
+        tpWindow = "Телепорт к игроку", tpBtn = "Телепорт",
+        changeLang = "Сменить язык", langWindow = "Язык",
+    },
+    ES = {
+        tabPlayer = "Jugador", tabTP = "Teletransporte", tabESP = "ESP", tabSettings = "Ajustes",
+        secSurvival = "Supervivencia", secMove = "Movimiento", secOther = "Otro",
+        secPlayers = "Jugadores", secObjects = "Objetos", secLocations = "Ubicaciones",
+        secHighlight = "Resaltado", secLang = "Idioma", secInfo = "Info",
+        godMode = "Modo Dios", godSpeed = "Velocidad en altura",
+        infJump = "Salto infinito", jumpPower = "Potencia de salto",
+        jumpPowerVal = "Potencia de salto (0=off)", noclip = "Noclip",
+        tpPlayer = "TP al jugador", tpNearestPlayer = "TP al jugador más cercano",
+        tpNearestObj = "TP al objeto más cercano", tpSpawn = "Sala de spawn",
+        espPlayers = "ESP Jugadores (verde)", espMonster = "ESP Monstruo (rojo)",
+        version = "Versión 2.0", on = "SÍ", off = "NO",
+        tpWindow = "TP al jugador", tpBtn = "Teletransportar",
+        changeLang = "Cambiar idioma", langWindow = "Idioma",
+    },
+    DE = {
+        tabPlayer = "Spieler", tabTP = "Teleport", tabESP = "ESP", tabSettings = "Einstellungen",
+        secSurvival = "Überleben", secMove = "Bewegung", secOther = "Sonstiges",
+        secPlayers = "Spieler", secObjects = "Objekte", secLocations = "Orte",
+        secHighlight = "Hervorhebung", secLang = "Sprache", secInfo = "Info",
+        godMode = "God Mode", godSpeed = "Geschwindigkeit in der Höhe",
+        infJump = "Unendlicher Sprung", jumpPower = "Sprungkraft",
+        jumpPowerVal = "Sprungkraft (0=aus)", noclip = "Noclip",
+        tpPlayer = "TP zum Spieler", tpNearestPlayer = "TP zum nächsten Spieler",
+        tpNearestObj = "TP zum nächsten Objekt", tpSpawn = "Spawnraum",
+        espPlayers = "ESP Spieler (grün)", espMonster = "ESP Monster (rot)",
+        version = "Version 2.0", on = "AN", off = "AUS",
+        tpWindow = "TP zum Spieler", tpBtn = "Teleportieren",
+        changeLang = "Sprache ändern", langWindow = "Sprache",
+    },
+    ZH = {
+        tabPlayer = "玩家", tabTP = "传送", tabESP = "透视", tabSettings = "设置",
+        secSurvival = "生存", secMove = "移动", secOther = "其他",
+        secPlayers = "玩家", secObjects = "物体", secLocations = "地点",
+        secHighlight = "高亮", secLang = "语言", secInfo = "信息",
+        godMode = "上帝模式", godSpeed = "高空移动速度",
+        infJump = "无限跳跃", jumpPower = "跳跃力",
+        jumpPowerVal = "跳跃力 (0=关)", noclip = "穿墙",
+        tpPlayer = "传送到玩家", tpNearestPlayer = "传送到最近玩家",
+        tpNearestObj = "传送到最近物体", tpSpawn = "出生房间",
+        espPlayers = "透视玩家（绿）", espMonster = "透视怪物（红）",
+        version = "版本 2.0", on = "开", off = "关",
+        tpWindow = "传送到玩家", tpBtn = "传送",
+        changeLang = "更改语言", langWindow = "语言",
+    },
+    JA = {
+        tabPlayer = "プレイヤー", tabTP = "テレポート", tabESP = "ESP", tabSettings = "設定",
+        secSurvival = "サバイバル", secMove = "移動", secOther = "その他",
+        secPlayers = "プレイヤー", secObjects = "オブジェクト", secLocations = "場所",
+        secHighlight = "ハイライト", secLang = "言語", secInfo = "情報",
+        godMode = "ゴッドモード", godSpeed = "高所での移動速度",
+        infJump = "無限ジャンプ", jumpPower = "ジャンプ力",
+        jumpPowerVal = "ジャンプ力 (0=オフ)", noclip = "壁抜け",
+        tpPlayer = "プレイヤーへTP", tpNearestPlayer = "最寄りプレイヤーへTP",
+        tpNearestObj = "最寄りオブジェクトへTP", tpSpawn = "スポーン部屋",
+        espPlayers = "ESP プレイヤー（緑）", espMonster = "ESP モンスター（赤）",
+        version = "バージョン 2.0", on = "オン", off = "オフ",
+        tpWindow = "プレイヤーへTP", tpBtn = "テレポート",
+        changeLang = "言語を変更", langWindow = "言語",
+    },
+    UK = {
+        tabPlayer = "Гравець", tabTP = "Телепорт", tabESP = "ESP", tabSettings = "Налаштування",
+        secSurvival = "Виживання", secMove = "Рух", secOther = "Інше",
+        secPlayers = "Гравці", secObjects = "Об'єкти", secLocations = "Локації",
+        secHighlight = "Підсвітка", secLang = "Мова", secInfo = "Інфо",
+        godMode = "Режим Бога", godSpeed = "Швидкість на висоті",
+        infJump = "Нескінченні стрибки", jumpPower = "Сила стрибка",
+        jumpPowerVal = "Сила стрибка (0=викл)", noclip = "Noclip",
+        tpPlayer = "ТП до гравця", tpNearestPlayer = "ТП до найближчого гравця",
+        tpNearestObj = "ТП до найближчого об'єкта", tpSpawn = "Кімната спавну",
+        espPlayers = "ESP Гравці (зелений)", espMonster = "ESP Монстр (червоний)",
+        version = "Версія 2.0", on = "УВІМК", off = "ВИКЛ",
+        tpWindow = "ТП до гравця", tpBtn = "Телепорт",
+        changeLang = "Змінити мову", langWindow = "Мова",
+    },
+    KK = {
+        tabPlayer = "Ойыншы", tabTP = "Телепорт", tabESP = "ESP", tabSettings = "Параметрлер",
+        secSurvival = "Тіршілік", secMove = "Қозғалыс", secOther = "Басқа",
+        secPlayers = "Ойыншылар", secObjects = "Нысандар", secLocations = "Орындар",
+        secHighlight = "Жарықтандыру", secLang = "Тіл", secInfo = "Ақпарат",
+        godMode = "Құдай режимі", godSpeed = "Биіктіктегі жылдамдық",
+        infJump = "Шексіз секіру", jumpPower = "Секіру күші",
+        jumpPowerVal = "Секіру күші (0=өш)", noclip = "Noclip",
+        tpPlayer = "Ойыншыға ТП", tpNearestPlayer = "Ең жақын ойыншыға ТП",
+        tpNearestObj = "Ең жақын нысанға ТП", tpSpawn = "Спавн бөлмесі",
+        espPlayers = "ESP Ойыншылар (жасыл)", espMonster = "ESP Құбыжық (қызыл)",
+        version = "Нұсқа 2.0", on = "ҚОС", off = "ӨШ",
+        tpWindow = "Ойыншыға ТП", tpBtn = "Телепорт",
+        changeLang = "Тілді ауыстыру", langWindow = "Тіл",
+    },
+    FR = {
+        tabPlayer = "Joueur", tabTP = "Téléport", tabESP = "ESP", tabSettings = "Paramètres",
+        secSurvival = "Survie", secMove = "Mouvement", secOther = "Autre",
+        secPlayers = "Joueurs", secObjects = "Objets", secLocations = "Lieux",
+        secHighlight = "Surlignage", secLang = "Langue", secInfo = "Info",
+        godMode = "Mode Dieu", godSpeed = "Vitesse en hauteur",
+        infJump = "Saut infini", jumpPower = "Puissance de saut",
+        jumpPowerVal = "Puissance de saut (0=off)", noclip = "Noclip",
+        tpPlayer = "TP au joueur", tpNearestPlayer = "TP au joueur le plus proche",
+        tpNearestObj = "TP à l'objet le plus proche", tpSpawn = "Salle de spawn",
+        espPlayers = "ESP Joueurs (vert)", espMonster = "ESP Monstre (rouge)",
+        version = "Version 2.0", on = "OUI", off = "NON",
+        tpWindow = "TP au joueur", tpBtn = "Téléporter",
+        changeLang = "Changer la langue", langWindow = "Langue",
+    },
+    IT = {
+        tabPlayer = "Giocatore", tabTP = "Teletrasporto", tabESP = "ESP", tabSettings = "Impostazioni",
+        secSurvival = "Sopravvivenza", secMove = "Movimento", secOther = "Altro",
+        secPlayers = "Giocatori", secObjects = "Oggetti", secLocations = "Luoghi",
+        secHighlight = "Evidenzia", secLang = "Lingua", secInfo = "Info",
+        godMode = "Modalità Dio", godSpeed = "Velocità in altezza",
+        infJump = "Salto infinito", jumpPower = "Potenza di salto",
+        jumpPowerVal = "Potenza di salto (0=off)", noclip = "Noclip",
+        tpPlayer = "TP al giocatore", tpNearestPlayer = "TP al giocatore più vicino",
+        tpNearestObj = "TP all'oggetto più vicino", tpSpawn = "Stanza di spawn",
+        espPlayers = "ESP Giocatori (verde)", espMonster = "ESP Mostro (rosso)",
+        version = "Versione 2.0", on = "SÌ", off = "NO",
+        tpWindow = "TP al giocatore", tpBtn = "Teletrasporta",
+        changeLang = "Cambia lingua", langWindow = "Lingua",
+    },
+}
+
+local function T() return Texts[CurrentLang] or Texts.EN end
+
+local State = {
+    InfJump = false, JumpPower = false, JumpPowerValue = 10,
+    Noclip = false,
+    GodMode = false, GodHeight = 10, GodSpeed = 30,
+    ESP_Players = false, ESP_Monster = false,
+}
+
+local function getChar() return LocalPlayer.Character end
+local function getHum()
+    local c = getChar()
+    return c and c:FindFirstChildOfClass("Humanoid")
+end
+local function getHRP()
+    local c = getChar()
+    return c and c:FindFirstChild("HumanoidRootPart")
+end
+
+local function findMonster()
+    for _, obj in ipairs(Workspace:GetDescendants()) do
+        if obj:IsA("Model") and obj:FindFirstChildOfClass("Humanoid") then
+            if not Players:GetPlayerFromCharacter(obj) and obj ~= LocalPlayer.Character then
+                return obj
+            end
+        end
+    end
+    return nil
+end
+
+-- ================= GOD MODE =================
+local godBaseY = nil
+local godActive = false
+
+local function startGod()
+    local hrp = getHRP()
+    if not hrp then return end
+    godBaseY = hrp.Position.Y + State.GodHeight
+    godActive = true
+    local hum = getHum()
+    if hum then hum.PlatformStand = true end
+    hrp.Anchored = false
+end
+
+local function stopGod()
+    godActive = false
+    godBaseY = nil
+    local hum = getHum()
+    if hum then hum.PlatformStand = false end
+end
+
+RunService.RenderStepped:Connect(function()
+    if not godActive then return end
+    if not State.GodMode then return end
+    local hrp = getHRP()
+    local hum = getHum()
+    if not hrp or not hum then return end
+    if not godBaseY then return end
+
+    local dt = 1/60
+    local move = hum.MoveDirection
+    local speed = State.GodSpeed * 0.4
+    local newX = hrp.Position.X
+    local newZ = hrp.Position.Z
+    if move.Magnitude > 0 then
+        newX = newX + move.X * speed * dt
+        newZ = newZ + move.Z * speed * dt
+    end
+    hrp.CFrame = CFrame.new(newX, godBaseY, newZ)
+    hrp.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
+end)
+
+-- ================= INF JUMP =================
+UserInputService.JumpRequest:Connect(function()
+    if not State.InfJump then return end
+    local hum = getHum()
+    if hum then hum:ChangeState(Enum.HumanoidStateType.Jumping) end
+end)
+
+-- ================= JUMP POWER =================
+RunService.RenderStepped:Connect(function()
+    if not State.JumpPower then return end
+    local hum = getHum(); if not hum then return end
+    pcall(function() hum.UseJumpPower = true end)
+    local target = State.JumpPowerValue == 0 and 0 or (State.JumpPowerValue * 5)
+    if hum.JumpPower ~= target then hum.JumpPower = target end
+end)
+
+-- ================= NOCLIP =================
+local noclipTracked = {}
+RunService.Stepped:Connect(function()
+    if not State.Noclip then return end
+    local c = getChar(); if not c then return end
+    for _, part in ipairs(c:GetDescendants()) do
+        if part:IsA("BasePart") then
+            if noclipTracked[part] == nil then noclipTracked[part] = part.CanCollide end
+            part.CanCollide = false
+        end
+    end
+end)
+
+local function restoreNoclip()
+    for part, val in pairs(noclipTracked) do
+        if part and part.Parent then part.CanCollide = val end
+    end
+    noclipTracked = {}
+end
+
+-- ================= ESP =================
+task.spawn(function()
+    while task.wait(0.3) do
+        for _, plr in ipairs(Players:GetPlayers()) do
+            if plr ~= LocalPlayer and plr.Character then
+                if State.ESP_Players then
+                    local h = plr.Character:FindFirstChild("LocustESP_P")
+                    if not h then
+                        h = Instance.new("Highlight")
+                        h.Name = "LocustESP_P"
+                        h.FillColor = Color3.fromRGB(0, 255, 0)
+                        h.FillTransparency = 0.5
+                        h.OutlineColor = Color3.fromRGB(0, 255, 0)
+                        h.OutlineTransparency = 0
+                        h.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+                        h.Adornee = plr.Character
+                        h.Parent = plr.Character
+                    end
+                else
+                    local h = plr.Character:FindFirstChild("LocustESP_P")
+                    if h then h:Destroy() end
+                end
+            end
+        end
+
+        local M = findMonster()
+        if M then
+            if State.ESP_Monster then
+                local h = M:FindFirstChild("LocustESP_M")
+                if not h then
+                    h = Instance.new("Highlight")
+                    h.Name = "LocustESP_M"
+                    h.FillColor = Color3.fromRGB(255, 0, 0)
+                    h.FillTransparency = 0.5
+                    h.OutlineColor = Color3.fromRGB(255, 0, 0)
+                    h.OutlineTransparency = 0
+                    h.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+                    h.Adornee = M
+                    h.Parent = M
+                end
+            else
+                local h = M:FindFirstChild("LocustESP_M")
+                if h then h:Destroy() end
+            end
+        end
+    end
+end)
+
+-- =====================================================
+-- GUI
+-- =====================================================
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "LocustMenu"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.DisplayOrder = 10
+ScreenGui.IgnoreGuiInset = true
+ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+
+local PopupGui = Instance.new("ScreenGui")
+PopupGui.Name = "LocustPopups"
+PopupGui.ResetOnSpawn = false
+PopupGui.DisplayOrder = 100
+PopupGui.IgnoreGuiInset = true
+PopupGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+
+-- SES
+local ses = Instance.new("Sound")
+ses.SoundId = SES_ID
+ses.Volume = 0.5
+ses.Parent = ScreenGui
+
+local function tikSesi()
+    local s = ses:Clone()
+    s.Parent = ScreenGui
+    s:Play()
+    task.delay(2, function() s:Destroy() end)
+end
+
+-- =====================================================
+-- TOGGLE BUTONU
+-- =====================================================
+local toggleBtn = Instance.new("TextButton")
+toggleBtn.Name = "ToggleBtn"
+toggleBtn.Size = UDim2.new(0, 44, 0, 44)
+toggleBtn.Position = UDim2.new(0, 24, 0, 24)
+toggleBtn.BackgroundColor3 = Color3.fromRGB(20, 20, 30)
+toggleBtn.Text = ""
+toggleBtn.AutoButtonColor = false
+toggleBtn.BorderSizePixel = 0
+toggleBtn.Draggable = true
+toggleBtn.Visible = false
+toggleBtn.ClipsDescendants = true
+toggleBtn.Parent = ScreenGui
+
+local toggleCorner = Instance.new("UICorner")
+toggleCorner.CornerRadius = UDim.new(1, 0)
+toggleCorner.Parent = toggleBtn
+
+local toggleStroke = Instance.new("UIStroke")
+toggleStroke.Color = RENK.cyan
+toggleStroke.Thickness = 1.8
+toggleStroke.Transparency = 0.2
+toggleStroke.Parent = toggleBtn
+
+local toggleImg = Instance.new("ImageLabel")
+toggleImg.Size = UDim2.new(1, 0, 1, 0)
+toggleImg.BackgroundTransparency = 1
+toggleImg.Image = TOGGLE_RESIM
+toggleImg.ScaleType = Enum.ScaleType.Crop
+toggleImg.ZIndex = 2
+toggleImg.ClipsDescendants = true
+toggleImg.Parent = toggleBtn
+
+local toggleImgCorner = Instance.new("UICorner")
+toggleImgCorner.CornerRadius = UDim.new(1, 0)
+toggleImgCorner.Parent = toggleImg
+
+-- =====================================================
+-- ANA PANEL
+-- =====================================================
+local Main = Instance.new("Frame")
+Main.Name = "Main"
+Main.Size = UDim2.new(0, 380, 0, 480)
+Main.Position = UDim2.new(0.5, -190, 0.5, -240)
+Main.BackgroundColor3 = RENK.bg
+Main.BorderSizePixel = 0
+Main.Active = true
+Main.Draggable = true
+Main.ClipsDescendants = true
+Main.Parent = ScreenGui
+
+local mc = Instance.new("UICorner"); mc.CornerRadius = UDim.new(0, 14); mc.Parent = Main
+local ms = Instance.new("UIStroke"); ms.Color = RENK.kenar; ms.Thickness = 1.3; ms.Transparency = 0.3; ms.Parent = Main
+
+-- YÜZEN YÜZLER
+local yuzerResimler = {}
+local function yuzerResimOlustur()
+    local resim = Instance.new("ImageLabel")
+    resim.Size = UDim2.new(0, 30 + math.random(15, 40), 0, 30 + math.random(15, 40))
+    resim.Position = UDim2.new(math.random() * 1, math.random(-20, 20), math.random() * 1, math.random(-20, 20))
+    resim.BackgroundTransparency = 1
+    resim.Image = RESIM
+    resim.ImageTransparency = 0.78 + math.random() * 0.12
+    resim.ScaleType = Enum.ScaleType.Crop
+    resim.ZIndex = 2
+    resim.Rotation = math.random(-30, 30)
+    resim.ClipsDescendants = true
+    resim.Active = false
+    resim.Parent = Main
+    local c = Instance.new("UICorner")
+    c.CornerRadius = UDim.new(1, 0)
+    c.Parent = resim
+    table.insert(yuzerResimler, {
+        resim = resim,
+        hiz = 0.5 + math.random() * 1.5,
+        genlik = 12 + math.random() * 22,
+        faz = math.random() * math.pi * 2,
+        baslangicPoz = resim.Position,
+        donmeHizi = (math.random() - 0.5) * 3,
+        baslangicRot = resim.Rotation,
+    })
+end
+for i = 1, 10 do yuzerResimOlustur() end
+
+task.spawn(function()
+    local t = 0
+    while ScreenGui.Parent do
+        t = t + 0.03
+        for _, v in ipairs(yuzerResimler) do
+            if v.resim.Parent then
+                local xOff = math.sin(t * v.hiz + v.faz) * v.genlik
+                local yOff = math.cos(t * v.hiz * 0.8 + v.faz) * v.genlik
+                v.resim.Position = UDim2.new(
+                    v.baslangicPoz.X.Scale, v.baslangicPoz.X.Offset + xOff,
+                    v.baslangicPoz.Y.Scale, v.baslangicPoz.Y.Offset + yOff
+                )
+                v.resim.Rotation = v.baslangicRot + math.sin(t * v.donmeHizi) * 20
+            end
+        end
+        task.wait(0.03)
+    end
+end)
+
+-- OVERLAY
+local overlay = Instance.new("Frame")
+overlay.Size = UDim2.new(1, 0, 1, 0)
+overlay.BackgroundColor3 = Color3.fromRGB(8, 12, 20)
+overlay.BackgroundTransparency = 0.72
+overlay.BorderSizePixel = 0
+overlay.ZIndex = 3
+overlay.Active = false
+overlay.Parent = Main
+
+local ovC = Instance.new("UICorner")
+ovC.CornerRadius = UDim.new(0, 14)
+ovC.Parent = overlay
+
+local overlayGrad = Instance.new("UIGradient")
+overlayGrad.Rotation = 45
+overlayGrad.Color = ColorSequence.new({
+    ColorSequenceKeypoint.new(0.00, Color3.fromRGB(10, 18, 30)),
+    ColorSequenceKeypoint.new(0.50, Color3.fromRGB(15, 25, 45)),
+    ColorSequenceKeypoint.new(1.00, Color3.fromRGB(8, 15, 28)),
+})
+overlayGrad.Transparency = NumberSequence.new({
+    NumberSequenceKeypoint.new(0, 0.4),
+    NumberSequenceKeypoint.new(0.5, 0.6),
+    NumberSequenceKeypoint.new(1, 0.4),
+})
+overlayGrad.Parent = overlay
+
+task.spawn(function()
+    while ScreenGui.Parent do
+        for i = 0, 360, 3 do
+            if not ScreenGui.Parent then break end
+            overlayGrad.Rotation = i
+            task.wait(0.05)
+        end
+    end
+end)
+
+task.spawn(function()
+    local t = 0
+    while ScreenGui.Parent do
+        t = t + 0.02
+        local pulse = (math.sin(t * 2) + 1) / 2
+        ms.Transparency = 0.3 + pulse * 0.4
+        task.wait(0.03)
+    end
+end)
+
+-- =====================================================
+-- TOP BAR
+-- =====================================================
+local TopBar = Instance.new("Frame")
+TopBar.Size = UDim2.new(1, 0, 0, 40)
+TopBar.BackgroundColor3 = Color3.fromRGB(15, 15, 25)
+TopBar.BackgroundTransparency = 0.4
+TopBar.BorderSizePixel = 0
+TopBar.ZIndex = 5
+TopBar.Active = false
+TopBar.Parent = Main
+
+local tc = Instance.new("UICorner"); tc.CornerRadius = UDim.new(0, 14); tc.Parent = TopBar
+
+local topBarFix = Instance.new("Frame")
+topBarFix.Size = UDim2.new(1, 0, 0, 14)
+topBarFix.Position = UDim2.new(0, 0, 1, -14)
+topBarFix.BackgroundColor3 = Color3.fromRGB(15, 15, 25)
+topBarFix.BackgroundTransparency = 0.4
+topBarFix.BorderSizePixel = 0
+topBarFix.ZIndex = 5
+topBarFix.Active = false
+topBarFix.Parent = TopBar
+
+local logoImg = Instance.new("ImageLabel")
+logoImg.Size = UDim2.new(0, 22, 0, 22)
+logoImg.Position = UDim2.new(0, 14, 0.5, -11)
+logoImg.BackgroundTransparency = 1
+logoImg.Image = RESIM
+logoImg.ScaleType = Enum.ScaleType.Crop
+logoImg.ZIndex = 8
+logoImg.Active = false
+logoImg.ClipsDescendants = true
+logoImg.Parent = TopBar
+
+local logoCorner = Instance.new("UICorner")
+logoCorner.CornerRadius = UDim.new(1, 0)
+logoCorner.Parent = logoImg
+
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1, -100, 1, 0)
+Title.Position = UDim2.new(0, 46, 0, 0)
+Title.BackgroundTransparency = 1
+Title.Text = "THE LOCUST"
+Title.TextColor3 = RENK.acik_mavi
+Title.Font = FONT
+Title.TextSize = 20
+Title.TextXAlignment = Enum.TextXAlignment.Left
+Title.ZIndex = 10
+Title.Active = false
+Title.Parent = TopBar
+
+local BtnMin = Instance.new("TextButton")
+BtnMin.Size = UDim2.new(0, 28, 0, 28)
+BtnMin.Position = UDim2.new(1, -66, 0.5, -14)
+BtnMin.BackgroundColor3 = RENK.beyaz
+BtnMin.BackgroundTransparency = 0.92
+BtnMin.Text = "−"
+BtnMin.TextColor3 = RENK.gri
+BtnMin.Font = Enum.Font.GothamBold
+BtnMin.TextSize = 16
+BtnMin.AutoButtonColor = false
+BtnMin.ZIndex = 10
+BtnMin.Parent = TopBar
+
+local minCorner = Instance.new("UICorner"); minCorner.CornerRadius = UDim.new(0, 7); minCorner.Parent = BtnMin
+
+BtnMin.MouseEnter:Connect(function()
+    BtnMin.BackgroundTransparency = 0.6
+    BtnMin:TweenSize(UDim2.new(0, 31, 0, 31), "Quad", "Out", 0.15, true)
+end)
+BtnMin.MouseLeave:Connect(function()
+    BtnMin.BackgroundTransparency = 0.92
+    BtnMin:TweenSize(UDim2.new(0, 28, 0, 28), "Quad", "Out", 0.15, true)
+end)
+
+local BtnClose = Instance.new("TextButton")
+BtnClose.Size = UDim2.new(0, 28, 0, 28)
+BtnClose.Position = UDim2.new(1, -34, 0.5, -14)
+BtnClose.BackgroundColor3 = RENK.beyaz
+BtnClose.BackgroundTransparency = 0.92
+BtnClose.Text = "×"
+BtnClose.TextColor3 = RENK.kirmizi
+BtnClose.Font = Enum.Font.GothamBold
+BtnClose.TextSize = 17
+BtnClose.AutoButtonColor = false
+BtnClose.ZIndex = 10
+BtnClose.Parent = TopBar
+
+local closeCorner = Instance.new("UICorner"); closeCorner.CornerRadius = UDim.new(0, 7); closeCorner.Parent = BtnClose
+
+BtnClose.MouseEnter:Connect(function()
+    BtnClose.BackgroundTransparency = 0.6
+    BtnClose.BackgroundColor3 = RENK.kirmizi
+    BtnClose.TextColor3 = RENK.beyaz
+    BtnClose:TweenSize(UDim2.new(0, 31, 0, 31), "Quad", "Out", 0.15, true)
+end)
+BtnClose.MouseLeave:Connect(function()
+    BtnClose.BackgroundTransparency = 0.92
+    BtnClose.BackgroundColor3 = RENK.beyaz
+    BtnClose.TextColor3 = RENK.kirmizi
+    BtnClose:TweenSize(UDim2.new(0, 28, 0, 28), "Quad", "Out", 0.15, true)
+end)
+
+-- =====================================================
+-- TAB BAR
+-- =====================================================
+local TabBar = Instance.new("Frame")
+TabBar.Size = UDim2.new(1, -24, 0, 30)
+TabBar.Position = UDim2.new(0, 12, 0, 48)
+TabBar.BackgroundTransparency = 1
+TabBar.ZIndex = 8
+TabBar.Active = false
+TabBar.Parent = Main
+
+local TabLayout = Instance.new("UIListLayout")
+TabLayout.FillDirection = Enum.FillDirection.Horizontal
+TabLayout.Padding = UDim.new(0, 6)
+TabLayout.Parent = TabBar
+
+local TextElements = {}
+
+local tabList = {}
+local tabKeys = {"tabPlayer", "tabTP", "tabESP", "tabSettings"}
+
+local function makeTabBtn(text, key)
+    local b = Instance.new("TextButton")
+    b.Size = UDim2.new(0, 80, 1, 0)
+    b.BackgroundColor3 = RENK.beyaz
+    b.BackgroundTransparency = 0.92
+    b.Text = text
+    b.TextColor3 = RENK.gri
+    b.Font = FONT
+    b.TextSize = 13
+    b.AutoButtonColor = false
+    b.BorderSizePixel = 0
+    b.ZIndex = 9
+    b.Parent = TabBar
+    local c = Instance.new("UICorner"); c.CornerRadius = UDim.new(0, 6); c.Parent = b
+    local s = Instance.new("UIStroke"); s.Color = RENK.kenar; s.Thickness = 1; s.Transparency = 0.5; s.Parent = b
+    table.insert(TextElements, {obj = b, key = key, type = "tab"})
+    return b, s
+end
+
+for _, key in ipairs(tabKeys) do
+    local b, s = makeTabBtn(T()[key], key)
+    table.insert(tabList, b)
+end
+
+-- CONTENT
+local Content = Instance.new("Frame")
+Content.Size = UDim2.new(1, -24, 1, -96)
+Content.Position = UDim2.new(0, 12, 0, 86)
+Content.BackgroundColor3 = RENK.beyaz
+Content.BackgroundTransparency = 0.94
+Content.BorderSizePixel = 0
+Content.ZIndex = 8
+Content.ClipsDescendants = true
+Content.Parent = Main
+
+local cc = Instance.new("UICorner"); cc.CornerRadius = UDim.new(0, 8); cc.Parent = Content
+local ccs = Instance.new("UIStroke"); ccs.Color = RENK.kenar; ccs.Transparency = 0.6; ccs.Thickness = 1; ccs.Parent = Content
+
+local function newPage()
+    local p = Instance.new("ScrollingFrame")
+    p.Size = UDim2.new(1, 0, 1, 0)
+    p.BackgroundTransparency = 1
+    p.BorderSizePixel = 0
+    p.ScrollBarThickness = 3
+    p.ScrollBarImageColor3 = RENK.cyan
+    p.CanvasSize = UDim2.new(0, 0, 0, 700)
+    p.Visible = false
+    p.ZIndex = 9
+    p.Parent = Content
+    local lay = Instance.new("UIListLayout")
+    lay.Padding = UDim.new(0, 6)
+    lay.HorizontalAlignment = Enum.HorizontalAlignment.Center
+    lay.Parent = p
+    local pd = Instance.new("UIPadding")
+    pd.PaddingTop = UDim.new(0, 8)
+    pd.PaddingLeft = UDim.new(0, 8)
+    pd.PaddingRight = UDim.new(0, 8)
+    pd.Parent = p
+    return p
+end
+
+local PagePlayer = newPage()
+local PageTP = newPage()
+local PageESP = newPage()
+local PageSettings = newPage()
+
+local function newSection(parent, key, accent)
+    accent = accent or RENK.acik_mavi
+    local l = Instance.new("TextLabel")
+    l.Size = UDim2.new(1, -4, 0, 26)
+    l.BackgroundColor3 = RENK.bg3
+    l.BackgroundTransparency = 0.3
+    l.Text = "· " .. T()[key] .. " ·"
+    l.TextColor3 = accent
+    l.Font = FONT
+    l.TextSize = 13
+    l.ZIndex = 10
+    l.Parent = parent
+    local c = Instance.new("UICorner"); c.CornerRadius = UDim.new(0, 6); c.Parent = l
+    local s = Instance.new("UIStroke"); s.Color = accent; s.Transparency = 0.7; s.Parent = l
+    table.insert(TextElements, {obj = l, key = key, type = "section", accent = accent})
+end
+
+local function newToggle(parent, key, callback, accent)
+    accent = accent or RENK.yesil
+    local b = Instance.new("TextButton")
+    b.Size = UDim2.new(1, -4, 0, 32)
+    b.BackgroundColor3 = RENK.beyaz
+    b.BackgroundTransparency = 0.92
+    b.Text = ""
+    b.AutoButtonColor = false
+    b.BorderSizePixel = 0
+    b.ClipsDescendants = true
+    b.ZIndex = 9
+    b.Parent = parent
+    local c = Instance.new("UICorner"); c.CornerRadius = UDim.new(0, 8); c.Parent = b
+    local s = Instance.new("UIStroke"); s.Color = accent; s.Thickness = 1.2; s.Transparency = 0.3; s.Parent = b
+
+    local dot = Instance.new("Frame")
+    dot.Size = UDim2.new(0, 5, 0, 5)
+    dot.Position = UDim2.new(0, 8, 0.5, -2.5)
+    dot.BackgroundColor3 = accent
+    dot.BorderSizePixel = 0
+    dot.ZIndex = 10
+    dot.Parent = b
+    local dc = Instance.new("UICorner"); dc.CornerRadius = UDim.new(1, 0); dc.Parent = dot
+
+    local lbl = Instance.new("TextLabel")
+    lbl.Size = UDim2.new(1, -20, 1, 0)
+    lbl.Position = UDim2.new(0, 20, 0, 0)
+    lbl.BackgroundTransparency = 1
+    lbl.Text = T()[key] .. ": " .. T().off
+    lbl.TextColor3 = RENK.beyaz
+    lbl.Font = FONT_MED
+    lbl.TextSize = 12
+    lbl.TextXAlignment = Enum.TextXAlignment.Left
+    lbl.ZIndex = 10
+    lbl.Active = false
+    lbl.Parent = b
+
+    local entry = {obj = lbl, key = key, type = "toggle", isOn = false, accent = accent}
+    table.insert(TextElements, entry)
+
+    b.MouseEnter:Connect(function()
+        b.BackgroundTransparency = 0.85
+        s.Transparency = 0
+    end)
+    b.MouseLeave:Connect(function()
+        b.BackgroundTransparency = 0.92
+        s.Transparency = 0.3
+    end)
+
+    b.MouseButton1Click:Connect(function()
+        tikSesi()
+        local on = not entry.isOn
+        entry.isOn = on
+        lbl.Text = T()[key] .. ": " .. (on and T().on or T().off)
+        s.Color = on and RENK.yesil or accent
+        dot.BackgroundColor3 = on and RENK.yesil or accent
+        callback(on)
+    end)
+    return b
+end
+
+local function newButton(parent, key, callback, accent)
+    accent = accent or RENK.acik_mavi
+    local b = Instance.new("TextButton")
+    b.Size = UDim2.new(1, -4, 0, 32)
+    b.BackgroundColor3 = RENK.beyaz
+    b.BackgroundTransparency = 0.92
+    b.Text = ""
+    b.AutoButtonColor = false
+    b.BorderSizePixel = 0
+    b.ClipsDescendants = true
+    b.ZIndex = 9
+    b.Parent = parent
+    local c = Instance.new("UICorner"); c.CornerRadius = UDim.new(0, 8); c.Parent = b
+    local s = Instance.new("UIStroke"); s.Color = accent; s.Thickness = 1.2; s.Transparency = 0.3; s.Parent = b
+
+    local dot = Instance.new("Frame")
+    dot.Size = UDim2.new(0, 5, 0, 5)
+    dot.Position = UDim2.new(0, 8, 0.5, -2.5)
+    dot.BackgroundColor3 = accent
+    dot.BorderSizePixel = 0
+    dot.ZIndex = 10
+    dot.Parent = b
+    local dc = Instance.new("UICorner"); dc.CornerRadius = UDim.new(1, 0); dc.Parent = dot
+
+    local lbl = Instance.new("TextLabel")
+    lbl.Size = UDim2.new(1, -20, 1, 0)
+    lbl.Position = UDim2.new(0, 20, 0, 0)
+    lbl.BackgroundTransparency = 1
+    lbl.Text = T()[key]
+    lbl.TextColor3 = RENK.beyaz
+    lbl.Font = FONT_MED
+    lbl.TextSize = 12
+    lbl.TextXAlignment = Enum.TextXAlignment.Left
+    lbl.ZIndex = 10
+    lbl.Active = false
+    lbl.Parent = b
+
+    table.insert(TextElements, {obj = lbl, key = key, type = "button", accent = accent})
+
+    b.MouseEnter:Connect(function()
+        b.BackgroundTransparency = 0.85
+        s.Transparency = 0
+    end)
+    b.MouseLeave:Connect(function()
+        b.BackgroundTransparency = 0.92
+        s.Transparency = 0.3
+    end)
+
+    b.MouseButton1Click:Connect(function()
+        tikSesi()
+        callback(b)
+    end)
+    return b
+end
+
+local function newSlider(parent, key, minV, maxV, defV, callback, accent)
+    accent = accent or RENK.cyan
+    local box = Instance.new("Frame")
+    box.Size = UDim2.new(1, -4, 0, 40)
+    box.BackgroundColor3 = RENK.beyaz
+    box.BackgroundTransparency = 0.92
+    box.BorderSizePixel = 0
+    box.ZIndex = 9
+    box.Parent = parent
+    local bc = Instance.new("UICorner"); bc.CornerRadius = UDim.new(0, 8); bc.Parent = box
+    local bs = Instance.new("UIStroke"); bs.Color = accent; bs.Thickness = 1.2; bs.Transparency = 0.3; bs.Parent = box
+
+    local lbl = Instance.new("TextLabel")
+    lbl.Size = UDim2.new(0, 140, 0, 18)
+    lbl.Position = UDim2.new(0, 8, 0, 4)
+    lbl.BackgroundTransparency = 1
+    lbl.Text = T()[key] .. ": " .. tostring(defV)
+    lbl.TextColor3 = RENK.beyaz
+    lbl.Font = FONT_MED
+    lbl.TextSize = 11
+    lbl.TextXAlignment = Enum.TextXAlignment.Left
+    lbl.ZIndex = 10
+    lbl.Active = false
+    lbl.Parent = box
+
+    local entry = {obj = lbl, key = key, type = "slider", value = defV, accent = accent}
+    table.insert(TextElements, entry)
+
+    local track = Instance.new("Frame")
+    track.Size = UDim2.new(1, -20, 0, 8)
+    track.Position = UDim2.new(0, 10, 0, 26)
+    track.BackgroundColor3 = RENK.bg
+    track.BorderSizePixel = 0
+    track.ZIndex = 10
+    track.Parent = box
+    local tcc = Instance.new("UICorner"); tcc.CornerRadius = UDim.new(1, 0); tcc.Parent = track
+
+    local fill = Instance.new("Frame")
+    fill.Size = UDim2.new(0, 0, 1, 0)
+    fill.BackgroundColor3 = accent
+    fill.BorderSizePixel = 0
+    fill.ZIndex = 10
+    fill.Parent = track
+    local fc = Instance.new("UICorner"); fc.CornerRadius = UDim.new(1, 0); fc.Parent = fill
+
+    local knob = Instance.new("Frame")
+    knob.Size = UDim2.new(0, 16, 0, 16)
+    knob.Position = UDim2.new(0, -8, 0.5, -8)
+    knob.BackgroundColor3 = RENK.beyaz
+    knob.BorderSizePixel = 0
+    knob.ZIndex = 11
+    knob.Parent = track
+    local kc = Instance.new("UICorner"); kc.CornerRadius = UDim.new(1, 0); kc.Parent = knob
+
+    local function setV(v)
+        v = math.clamp(v, minV, maxV)
+        v = math.floor(v + 0.5)
+        entry.value = v
+        local a = (v - minV) / (maxV - minV)
+        fill.Size = UDim2.new(a, 0, 1, 0)
+        knob.Position = UDim2.new(a, -8, 0.5, -8)
+        lbl.Text = T()[key] .. ": " .. tostring(v)
+        callback(v)
+    end
+    setV(defV)
+
+    local drag = false
+    local function upd(i)
+        local ax = track.AbsolutePosition.X
+        local aw = track.AbsoluteSize.X
+        if aw <= 0 then return end
+        local a = math.clamp((i.Position.X - ax) / aw, 0, 1)
+        setV(minV + a * (maxV - minV))
+    end
+    track.InputBegan:Connect(function(i)
+        if i.UserInputType == Enum.UserInputType.MouseButton1 or i.UserInputType == Enum.UserInputType.Touch then
+            drag = true; upd(i)
+        end
+    end)
+    knob.InputBegan:Connect(function(i)
+        if i.UserInputType == Enum.UserInputType.MouseButton1 or i.UserInputType == Enum.UserInputType.Touch then
+            drag = true; upd(i)
+        end
+    end)
+    UserInputService.InputChanged:Connect(function(i)
+        if drag and (i.UserInputType == Enum.UserInputType.MouseMovement or i.UserInputType == Enum.UserInputType.Touch) then
+            upd(i)
+        end
+    end)
+    UserInputService.InputEnded:Connect(function(i)
+        if i.UserInputType == Enum.UserInputType.MouseButton1 or i.UserInputType == Enum.UserInputType.Touch then
+            drag = false
+        end
+    end)
+    return box
+end
+
+-- =====================================================
+-- PLAYER SELECT POPUP
+-- =====================================================
+local PlayerSelectWindow = Instance.new("Frame")
+PlayerSelectWindow.Size = UDim2.new(0, 280, 0, 420)
+PlayerSelectWindow.Position = UDim2.new(0.5, -140, 0.5, -210)
+PlayerSelectWindow.BackgroundColor3 = RENK.bg
+PlayerSelectWindow.BorderSizePixel = 0
+PlayerSelectWindow.Visible = false
+PlayerSelectWindow.ZIndex = 10
+PlayerSelectWindow.Active = true
+PlayerSelectWindow.Draggable = true
+PlayerSelectWindow.ClipsDescendants = true
+PlayerSelectWindow.Parent = PopupGui
+
+local psc = Instance.new("UICorner"); psc.CornerRadius = UDim.new(0, 12); psc.Parent = PlayerSelectWindow
+local pss = Instance.new("UIStroke"); pss.Color = RENK.kenar; pss.Thickness = 1.3; pss.Parent = PlayerSelectWindow
+
+local PSTitle = Instance.new("TextLabel")
+PSTitle.Size = UDim2.new(1, -44, 0, 36)
+PSTitle.Position = UDim2.new(0, 14, 0, 4)
+PSTitle.BackgroundTransparency = 1
+PSTitle.Text = T().tpWindow
+PSTitle.TextColor3 = RENK.cyan
+PSTitle.Font = FONT
+PSTitle.TextSize = 15
+PSTitle.TextXAlignment = Enum.TextXAlignment.Left
+PSTitle.ZIndex = 11
+PSTitle.Parent = PlayerSelectWindow
+table.insert(TextElements, {obj = PSTitle, key = "tpWindow", type = "button", accent = RENK.cyan})
+
+local PSClose = Instance.new("TextButton")
+PSClose.Size = UDim2.new(0, 28, 0, 28)
+PSClose.Position = UDim2.new(1, -34, 0, 4)
+PSClose.BackgroundColor3 = RENK.beyaz
+PSClose.BackgroundTransparency = 0.9
+PSClose.Text = "×"
+PSClose.TextColor3 = RENK.kirmizi
+PSClose.Font = Enum.Font.GothamBold
+PSClose.TextSize = 17
+PSClose.AutoButtonColor = false
+PSClose.ZIndex = 12
+PSClose.Parent = PlayerSelectWindow
+local pscc = Instance.new("UICorner"); pscc.CornerRadius = UDim.new(0, 7); pscc.Parent = PSClose
+
+local PSList = Instance.new("ScrollingFrame")
+PSList.Size = UDim2.new(1, -20, 1, -100)
+PSList.Position = UDim2.new(0, 10, 0, 40)
+PSList.BackgroundTransparency = 1
+PSList.BorderSizePixel = 0
+PSList.ScrollBarThickness = 3
+PSList.ScrollBarImageColor3 = RENK.cyan
+PSList.CanvasSize = UDim2.new(0, 0, 0, 600)
+PSList.ZIndex = 11
+PSList.Parent = PlayerSelectWindow
+
+local PSLay = Instance.new("UIListLayout")
+PSLay.Padding = UDim.new(0, 4)
+PSLay.HorizontalAlignment = Enum.HorizontalAlignment.Center
+PSLay.Parent = PSList
+
+local PSSelected = nil
+
+local function refreshPSList()
+    for _, ch in ipairs(PSList:GetChildren()) do
+        if ch:IsA("TextButton") then ch:Destroy() end
+    end
+    PSSelected = nil
+    for _, plr in ipairs(Players:GetPlayers()) do
+        if plr ~= LocalPlayer then
+            local b = Instance.new("TextButton")
+            b.Size = UDim2.new(1, -10, 0, 32)
+            b.BackgroundColor3 = RENK.beyaz
+            b.BackgroundTransparency = 0.92
+            b.Text = plr.Name
+            b.TextColor3 = RENK.beyaz
+            b.Font = FONT_MED
+            b.TextSize = 12
+            b.AutoButtonColor = false
+            b.ZIndex = 12
+            b.Parent = PSList
+            local c = Instance.new("UICorner"); c.CornerRadius = UDim.new(0, 7); c.Parent = b
+            local s = Instance.new("UIStroke"); s.Color = RENK.kenar; s.Transparency = 0.5; s.Parent = b
+            b.MouseButton1Click:Connect(function()
+                tikSesi()
+                PSSelected = plr
+                for _, ch in ipairs(PSList:GetChildren()) do
+                    if ch:IsA("TextButton") then
+                        ch.BackgroundTransparency = 0.92
+                        local ss = ch:FindFirstChildOfClass("UIStroke")
+                        if ss then ss.Color = RENK.kenar; ss.Transparency = 0.5 end
+                    end
+                end
+                b.BackgroundTransparency = 0.75
+                s.Color = RENK.cyan
+                s.Transparency = 0
+            end)
+        end
+    end
+end
+
+local PSTP = Instance.new("TextButton")
+PSTP.Size = UDim2.new(1, -20, 0, 36)
+PSTP.Position = UDim2.new(0, 10, 1, -46)
+PSTP.BackgroundColor3 = RENK.beyaz
+PSTP.BackgroundTransparency = 0.85
+PSTP.Text = T().tpBtn
+PSTP.TextColor3 = RENK.beyaz
+PSTP.Font = FONT_MED
+PSTP.TextSize = 13
+PSTP.AutoButtonColor = false
+PSTP.ZIndex = 12
+PSTP.Parent = PlayerSelectWindow
+local ptpc = Instance.new("UICorner"); ptpc.CornerRadius = UDim.new(0, 8); ptpc.Parent = PSTP
+local ptps = Instance.new("UIStroke"); ptps.Color = RENK.yesil; ptps.Thickness = 1.2; ptps.Transparency = 0.3; ptps.Parent = PSTP
+table.insert(TextElements, {obj = PSTP, key = "tpBtn", type = "button", accent = RENK.yesil})
+
+PSTP.MouseEnter:Connect(function() PSTP.BackgroundTransparency = 0.75; ptps.Transparency = 0 end)
+PSTP.MouseLeave:Connect(function() PSTP.BackgroundTransparency = 0.85; ptps.Transparency = 0.3 end)
+
+PSTP.MouseButton1Click:Connect(function()
+    tikSesi()
+    if PSSelected and PSSelected.Character then
+        local hrp = PSSelected.Character:FindFirstChild("HumanoidRootPart")
+        local myHrp = getHRP()
+        if hrp and myHrp then
+            if godActive then stopGod(); State.GodMode = false end
+            myHrp.CFrame = hrp.CFrame + Vector3.new(0, 3, 0)
+            PlayerSelectWindow.Visible = false
+        end
+    end
+end)
+
+PSClose.MouseButton1Click:Connect(function()
+    tikSesi()
+    PlayerSelectWindow.Visible = false
+end)
+
+-- =====================================================
+-- SAYFALAR
+-- =====================================================
+do
+    local p = PagePlayer
+    newSection(p, "secSurvival", RENK.kirmizi)
+    newToggle(p, "godMode", function(v)
+        State.GodMode = v
+        if v then startGod() else stopGod() end
+    end, RENK.kirmizi)
+    newSlider(p, "godSpeed", 5, 100, 30, function(v) State.GodSpeed = v end, RENK.kirmizi)
+
+    newSection(p, "secMove", RENK.yesil)
+    newToggle(p, "infJump", function(v) State.InfJump = v end, RENK.yesil)
+    newToggle(p, "jumpPower", function(v) State.JumpPower = v end, RENK.yesil)
+    newSlider(p, "jumpPowerVal", 0, 20, 10, function(v) State.JumpPowerValue = v end, RENK.yesil)
+
+    newSection(p, "secOther", RENK.mor)
+    newToggle(p, "noclip", function(v)
+        State.Noclip = v
+        if not v then restoreNoclip() end
+    end, RENK.mor)
+end
+
+do
+    local p = PageTP
+    newSection(p, "secPlayers", RENK.cyan)
+    newButton(p, "tpPlayer", function()
+        refreshPSList()
+        PlayerSelectWindow.Visible = true
+    end, RENK.cyan)
+    newButton(p, "tpNearestPlayer", function()
+        local myHrp = getHRP()
+        if not myHrp then return end
+        local best, bestD = nil, math.huge
+        for _, plr in ipairs(Players:GetPlayers()) do
+            if plr ~= LocalPlayer and plr.Character then
+                local hrp = plr.Character:FindFirstChild("HumanoidRootPart")
+                if hrp then
+                    local d = (hrp.Position - myHrp.Position).Magnitude
+                    if d < bestD then bestD = d; best = hrp end
+                end
+            end
+        end
+        if best then
+            if godActive then stopGod(); State.GodMode = false end
+            myHrp.CFrame = best.CFrame + Vector3.new(0, 3, 0)
+        end
+    end, RENK.cyan)
+
+    newSection(p, "secObjects", RENK.turuncu)
+    newButton(p, "tpNearestObj", function()
+        local myHrp = getHRP()
+        if not myHrp then return end
+        local best, bestD = nil, math.huge
+        local keywords = {"ball", "cube", "sofa", "couch", "clock", "barrier",
+                         "шарик", "кубик", "диван", "час", "преград"}
+        for _, obj in ipairs(Workspace:GetDescendants()) do
+            if obj:IsA("BasePart") or obj:IsA("Model") then
+                local n = obj.Name:lower()
+                for _, kw in ipairs(keywords) do
+                    if n:find(kw) then
+                        local pos = obj:IsA("BasePart") and obj.Position or (obj.PrimaryPart and obj.PrimaryPart.Position)
+                        if pos then
+                            local d = (pos - myHrp.Position).Magnitude
+                            if d < bestD and d < 500 then
+                                bestD = d
+                                best = pos
+                            end
+                        end
+                    end
+                end
+            end
+        end
+        if best then
+            if godActive then stopGod(); State.GodMode = false end
+            myHrp.CFrame = CFrame.new(best + Vector3.new(0, 3, 0))
+        end
+    end, RENK.turuncu)
+
+    newSection(p, "secLocations", RENK.mor)
+    newButton(p, "tpSpawn", function()
+        if godActive then stopGod(); State.GodMode = false end
+        local myHrp = getHRP()
+        if not myHrp then return end
+        local sp = Workspace:FindFirstChildOfClass("SpawnLocation")
+        if sp then
+            myHrp.CFrame = CFrame.new(sp.Position + Vector3.new(0, 3, 0))
+            return
+        end
+        for _, obj in ipairs(Workspace:GetDescendants()) do
+            if obj:IsA("BasePart") then
+                local n = obj.Name:lower()
+                if n:find("spawn") or n:find("спавн") then
+                    myHrp.CFrame = CFrame.new(obj.Position + Vector3.new(0, 3, 0))
+                    return
+                end
+            end
+        end
+    end, RENK.mor)
+end
+
+do
+    local p = PageESP
+    newSection(p, "secHighlight", RENK.kirmizi)
+    newToggle(p, "espPlayers", function(v) State.ESP_Players = v end, RENK.yesil)
+    newToggle(p, "espMonster", function(v) State.ESP_Monster = v end, RENK.kirmizi)
+end
+
+-- =====================================================
+-- LANG WINDOW
+-- =====================================================
+local LangWindow = Instance.new("Frame")
+LangWindow.Size = UDim2.new(0, 240, 0, 400)
+LangWindow.Position = UDim2.new(0.5, -120, 0.5, -200)
+LangWindow.BackgroundColor3 = RENK.bg
+LangWindow.BorderSizePixel = 0
+LangWindow.Visible = false
+LangWindow.ZIndex = 10
+LangWindow.Active = true
+LangWindow.Draggable = true
+LangWindow.ClipsDescendants = true
+LangWindow.Parent = PopupGui
+local lwc = Instance.new("UICorner"); lwc.CornerRadius = UDim.new(0, 12); lwc.Parent = LangWindow
+local lws = Instance.new("UIStroke"); lws.Color = RENK.kenar; lws.Thickness = 1.3; lws.Parent = LangWindow
+
+local LWTitle = Instance.new("TextLabel")
+LWTitle.Size = UDim2.new(1, -44, 0, 36)
+LWTitle.Position = UDim2.new(0, 14, 0, 4)
+LWTitle.BackgroundTransparency = 1
+LWTitle.Text = T().langWindow
+LWTitle.TextColor3 = RENK.cyan
+LWTitle.Font = FONT
+LWTitle.TextSize = 15
+LWTitle.TextXAlignment = Enum.TextXAlignment.Left
+LWTitle.ZIndex = 11
+LWTitle.Parent = LangWindow
+table.insert(TextElements, {obj = LWTitle, key = "langWindow", type = "button", accent = RENK.cyan})
+
+local LWClose = Instance.new("TextButton")
+LWClose.Size = UDim2.new(0, 28, 0, 28)
+LWClose.Position = UDim2.new(1, -34, 0, 4)
+LWClose.BackgroundColor3 = RENK.beyaz
+LWClose.BackgroundTransparency = 0.9
+LWClose.Text = "×"
+LWClose.TextColor3 = RENK.kirmizi
+LWClose.Font = Enum.Font.GothamBold
+LWClose.TextSize = 17
+LWClose.AutoButtonColor = false
+LWClose.ZIndex = 12
+LWClose.Parent = LangWindow
+local lwcc = Instance.new("UICorner"); lwcc.CornerRadius = UDim.new(0, 7); lwcc.Parent = LWClose
+
+local LWList = Instance.new("ScrollingFrame")
+LWList.Size = UDim2.new(1, -20, 1, -50)
+LWList.Position = UDim2.new(0, 10, 0, 40)
+LWList.BackgroundTransparency = 1
+LWList.BorderSizePixel = 0
+LWList.ScrollBarThickness = 3
+LWList.ScrollBarImageColor3 = RENK.cyan
+LWList.CanvasSize = UDim2.new(0, 0, 0, 600)
+LWList.ZIndex = 11
+LWList.Parent = LangWindow
+
+local LWLay = Instance.new("UIListLayout")
+LWLay.Padding = UDim.new(0, 4)
+LWLay.HorizontalAlignment = Enum.HorizontalAlignment.Center
+LWLay.Parent = LWList
+
+local function updateAllTexts()
+    local t = T()
+    for _, entry in ipairs(TextElements) do
+        local obj = entry.obj
+        local key = entry.key
+        if obj and key and t[key] then
+            if entry.type == "section" then
+                obj.Text = "· " .. t[key] .. " ·"
+            elseif entry.type == "toggle" then
+                obj.Text = t[key] .. ": " .. (entry.isOn and t.on or t.off)
+            elseif entry.type == "slider" then
+                obj.Text = t[key] .. ": " .. tostring(entry.value)
+            else
+                obj.Text = t[key]
+            end
+        end
+    end
+end
+
+local function refreshLangList()
+    for _, ch in ipairs(LWList:GetChildren()) do
+        if ch:IsA("TextButton") then ch:Destroy() end
+    end
+    for _, lang in ipairs(Languages) do
+        local b = Instance.new("TextButton")
+        b.Size = UDim2.new(1, -10, 0, 34)
+        b.BackgroundColor3 = RENK.beyaz
+        b.BackgroundTransparency = (lang.code == CurrentLang) and 0.75 or 0.92
+        b.Text = lang.name
+        b.TextColor3 = RENK.beyaz
+        b.Font = FONT_MED
+        b.TextSize = 13
+        b.AutoButtonColor = false
+        b.ZIndex = 12
+        b.Parent = LWList
+        local c = Instance.new("UICorner"); c.CornerRadius = UDim.new(0, 7); c.Parent = b
+        local s = Instance.new("UIStroke"); s.Color = (lang.code == CurrentLang) and RENK.cyan or RENK.kenar; s.Transparency = (lang.code == CurrentLang) and 0 or 0.5; s.Parent = b
+        b.MouseButton1Click:Connect(function()
+            tikSesi()
+            CurrentLang = lang.code
+            updateAllTexts()
+            LangWindow.Visible = false
+        end)
+    end
+end
+
+LWClose.MouseButton1Click:Connect(function()
+    tikSesi()
+    LangWindow.Visible = false
+end)
+
+do
+    local p = PageSettings
+    newSection(p, "secLang", RENK.cyan)
+    newButton(p, "changeLang", function()
+        refreshLangList()
+        LangWindow.Visible = true
+    end, RENK.cyan)
+    newSection(p, "secInfo", RENK.gri)
+    newButton(p, "version", function() end, RENK.gri)
+end
+
+-- =====================================================
+-- TAB GEÇİŞ
+-- =====================================================
+local aktifTab = nil
+local tabStrokes = {}
+for i, btn in ipairs(tabList) do
+    tabStrokes[btn] = btn:FindFirstChildOfClass("UIStroke")
+end
+
+local function switchPage(activeTab)
+    PagePlayer.Visible = (activeTab == tabList[1])
+    PageTP.Visible = (activeTab == tabList[2])
+    PageESP.Visible = (activeTab == tabList[3])
+    PageSettings.Visible = (activeTab == tabList[4])
+    for _, btn in ipairs(tabList) do
+        local s = tabStrokes[btn]
+        if btn == activeTab then
+            btn.BackgroundTransparency = 0.75
+            btn.TextColor3 = RENK.beyaz
+            if s then s.Color = RENK.cyan; s.Transparency = 0 end
+        else
+            btn.BackgroundTransparency = 0.92
+            btn.TextColor3 = RENK.gri
+            if s then s.Color = RENK.kenar; s.Transparency = 0.5 end
+        end
+    end
+    aktifTab = activeTab
+end
+
+for _, btn in ipairs(tabList) do
+    btn.MouseButton1Click:Connect(function()
+        tikSesi()
+        switchPage(btn)
+    end)
+end
+switchPage(tabList[1])
+
+-- MINIMIZE
+local minimized = false
+local normalSize = UDim2.new(0, 380, 0, 480)
+local minSize = UDim2.new(0, 380, 0, 40)
+
+BtnMin.MouseButton1Click:Connect(function()
+    tikSesi()
+    minimized = not minimized
+    if minimized then
+        Main.Size = minSize
+        TabBar.Visible = false
+        Content.Visible = false
+        BtnMin.Text = "□"
+    else
+        Main.Size = normalSize
+        TabBar.Visible = true
+        Content.Visible = true
+        BtnMin.Text = "−"
+    end
+end)
+
+-- CLOSE
+BtnClose.MouseButton1Click:Connect(function()
+    tikSesi()
+    State.InfJump = false; State.JumpPower = false
+    State.Noclip = false; State.GodMode = false
+    State.ESP_Players = false; State.ESP_Monster = false
+    restoreNoclip(); stopGod()
+    for _, plr in ipairs(Players:GetPlayers()) do
+        if plr.Character then
+            local h = plr.Character:FindFirstChild("LocustESP_P")
+            if h then h:Destroy() end
+        end
+    end
+    local M = findMonster()
+    if M then
+        local h = M:FindFirstChild("LocustESP_M")
+        if h then h:Destroy() end
+    end
+    ScreenGui:Destroy()
+    PopupGui:Destroy()
+end)
+
+-- TOGGLE
+toggleBtn.MouseButton1Click:Connect(function()
+    tikSesi()
+    Main.Visible = true
+    toggleBtn.Visible = false
+end)
+
+local function menuKapatToggle()
+    Main.Visible = false
+    toggleBtn.Visible = true
+end
+
+-- Menü minimize edilmişse toggle göster (kullanıcı kapattığında)
+-- Ana panel görünürken toggle gizli
+
+-- BAŞLANGIÇ
+Main.Visible = true
+toggleBtn.Visible = false
+
+-- İstersen menüyü kapatıp toggle'ı göstermek için bu satırı aç:
+-- task.delay(3, menuKapatToggle)
+
+print("[House of the Locust] CUSTOM GUI 2.0 loaded.")
